@@ -1,19 +1,45 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"maps"
-
-	"github.com/BurgerMan90001/untitled-backend/internal"
-	test "github.com/BurgerMan90001/untitled-backend/tests"
+	"net/http"
 )
 const (
     www = 2
 )
+
+func test(w http.ResponseWriter, r *http.Request) {
+
+}
+type User struct {
+    Id string `json:"id"`
+    Firstname string `json:"firstname"`
+    Lastname  string `json:"lastname"`
+    Age       int    `json:"age"`
+}
+var user = User {
+    Id: "123",
+    Firstname: "dasdasd",
+    Lastname: "Wwww",
+    Age: 32,
+}
 //const name = "writetcp"
 func main() {
-    internal.Goop()
-    test.Request()
+    http.HandleFunc("/", func (w http.ResponseWriter, r *http.Request) {
+        //fmt.Fprintf(w, "Welcome to my website!")
+        
+        json.NewEncoder(w).Encode(user)
+        json.NewDecoder().Decode()
+        
+    })
+
+    fs := http.FileServer(http.Dir("static/"))
+    http.Handle("/static/", http.StripPrefix("/static/", fs))
+
+    http.ListenAndServe(":8080", nil)
+}
    //app.test()
     
 	// log.SetPrefix(name + "\t")
@@ -34,7 +60,6 @@ func main() {
 	
 	//fmt.Println(nums)
 	
-}	
 
 func al() {
 
