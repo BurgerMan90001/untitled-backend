@@ -1,76 +1,75 @@
 package config
 
 import (
-	"fmt"
-	"os"
-	"path/filepath"
-	"sort"
+	"context"
+	"database/sql"
+	"io"
+	"log"
+	"strconv"
+	"time"
 
 	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
 )
 
 //"postgres://username:password@localhost:5432/database_name?sslmode=mode"
-type pgconfig struct {
-	user string
-	password string
-	database string
-	host string
-	sslmode string
-	port string
-}
 
-func checkErr(err error) {
+
+func RunDatabase() {
+	cfg, err := pgConfigFromEnv()
+
+	if err != nil {
+		log.Fatalf("Postgres configuration error %v", err)
+	}
+	
+	embedCfg := embedBuildConfig(cfg)
+
+	embedDb := embeddedpostgres.NewDatabase(embedCfg)
+
+
+	if err := embedDb.Start(); err != nil {
+		panic(err)
+	}
+
+	log.Printf("Postgres running on %s\n", embedCfg.GetConnectionURL())
+
+
+	defer embedDb.Stop()
+
+
+	DatabaseConnect(cfg.string())
+
+}
+func DatabaseConnect(url string) {
+	const timeout = 5*time.Second
+
+	db, err := sql.Open("postgres",url)
+
 	if err != nil {
 		panic(err)
 	}
-}
-func readEnvFile() {
-	path := filepath.Join(os.TempDir(), "dat")
-    dat, err := os.ReadFile(path)
-    checkErr(err)
-    fmt.Print(string(dat))
-}
-func connect() {
-	/*
-	var pgconfig = getConfig()
-	//config, err := pgconfig{}.getConfig()
 
+	defer db.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+    defer cancel()
+
+    if err := db.PingContext(ctx); err != nil {
+        panic(err)
+    }
+
+    log.Println("Ping successful")
+}
+
+func embedBuildConfig(cfg pgconfig) embeddedpostgres.Config {
+	portNum, err := strconv.Atoi(cfg.port)
 	if err != nil {
 		panic(err)
 	}
-	*/
-}
+	return embeddedpostgres.DefaultConfig().
+		Username(cfg.username).
+		Password(cfg.password).
+		Database(cfg.database).
+		Port(uint32(portNum)).
+		Logger(io.Discard)
 
-/* For testing */
-func runEmbedded() {
-	postgres := embeddedpostgres.NewDatabase()
-}	
-func createConfig() (pgconfig, error) {
-	var missing []string
-	
-	getConfigVal := func(key string) string {
-		val := os.Getenv(key)
-		if val == "" {
-			missing = append(missing, key)
-		}
-		return val
-	}
-
-	cfg := pgconfig{
-		user:     getConfigVal("PG_USER"),
-        database: getConfigVal("PG_DATABASE"),
-        host:     getConfigVal("PG_HOST"),
-        password: getConfigVal("PG_PASSWORD"),
-        port:     getConfigVal("PG_PORT"),
-	}
-
-	if len(missing) > 0 {
-		sort.Strings(missing)
-		return cfg, fmt.Errorf("missing config variables %v", missing)
-	}
-	return cfg, nil
-	
-}
-func (p pgconfig) getConfigString() string {
-	return ""
 }

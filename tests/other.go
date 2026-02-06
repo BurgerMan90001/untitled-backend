@@ -1,3 +1,16 @@
+package tests
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"log"
+	"net/http"
+	"os"
+	"time"
+
+	"github.com/BurgerMan90001/untitled-backend/internal/model"
+)
 
 type Response struct{ Time string } // note: no JSON tags here, so we just use 'Time' in uppercase.
 

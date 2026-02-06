@@ -1,21 +1,18 @@
 package server
 
 import (
-	"context"
-	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
-	"os"
 
-	"github.com/jackc/pgx/v5"
+	// side effects
+	_ "github.com/jackc/pgx/v5"
 
+	"github.com/BurgerMan90001/untitled-backend/internal/config"
 	"github.com/BurgerMan90001/untitled-backend/internal/model"
+	"github.com/BurgerMan90001/untitled-backend/pkg/util"
 )
 
-type Server struct {
-	
-}
+type Server struct {}
 
 var user = model.User {
     Id: "123",
@@ -25,13 +22,14 @@ var user = model.User {
 }
 
 
-func createServer() *Server {
+func NewServer() *Server {
 	s := Server{}
 	return &s;
 }
 
 
 func (s Server) createUser(w http.ResponseWriter, r *http.Request) {
+	
 	var user = model.User {
 		Id: "123",
 		Firstname: "dasdasd",
@@ -39,41 +37,25 @@ func (s Server) createUser(w http.ResponseWriter, r *http.Request) {
 		Age: 32,
 	}
 
-	renderJSON(w, user)
+	util.WriteJSON(w, user)
 }
 
 
 
-func renderJSON(w http.ResponseWriter, v interface{}) {
-    w.Header().Set("Content-type", "application/json")
-    js, err := json.Marshal(v)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
-    w.Write(js)
-}
 
 func Run() {
 	const url = "localhost:8080"
-	const urlDatabase = "postgres://username:password@localhost:5432/database_name?sslmode=mode"
-
-	conn, err := pgx.Connect(context.TODO(), urlDatabase)
-
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "unable to connect to database %v\n", err)
-	}
-
-	defer conn.Close(context.TODO())
-	
 
 
 	mux := http.NewServeMux()
-	server := createServer()
+	server := NewServer()
 
 	mux.HandleFunc("GET /", server.createUser)
 	
+	log.Printf("Server listening at %s", url)
 
-    err := http.ListenAndServe(url, mux)
-    log.Fatal(err)
+	config.RunDatabase()
+	//tests.Test()
+
+    log.Fatal(http.ListenAndServe(url, mux))
 }

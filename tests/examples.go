@@ -1,4 +1,4 @@
-package examples
+package tests
 
 import (
 	"context"
@@ -19,9 +19,6 @@ func Request() {
     fmt.Print(req)
 }
 
-func Test() {
-
-}
 
 type TextHandler string
 
