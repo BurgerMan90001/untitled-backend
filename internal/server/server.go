@@ -1,6 +1,7 @@
 package server
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 
@@ -12,7 +13,9 @@ import (
 	"github.com/BurgerMan90001/untitled-backend/pkg/util"
 )
 
-type Server struct {}
+type Server struct {
+	db *sql.DB
+}
 
 var user = model.User {
     Id: "123",
@@ -55,6 +58,7 @@ func Run() {
 	log.Printf("Server listening at %s", url)
 
 	config.RunDatabase()
+	//server.db := 
 	//tests.Test()
 
     log.Fatal(http.ListenAndServe(url, mux))

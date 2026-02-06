@@ -23,6 +23,8 @@ func Request() {
 type TextHandler string
 
 func (t TextHandler) ServeHTTP(w http.ResponseWriter, _ *http.Request) { w.Write([]byte(t)) } // implicit 200 OK
+
+
 func test() {
 	server := http.Server{
         Addr: ":8080",
