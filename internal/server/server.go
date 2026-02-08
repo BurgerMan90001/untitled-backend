@@ -1,6 +1,7 @@
 package server
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 
@@ -8,28 +9,22 @@ import (
 	_ "github.com/jackc/pgx/v5"
 
 	"github.com/BurgerMan90001/untitled-backend/internal/config"
+	"github.com/BurgerMan90001/untitled-backend/internal/middleware"
 	"github.com/BurgerMan90001/untitled-backend/internal/model"
-	"github.com/BurgerMan90001/untitled-backend/pkg/util"
+	"github.com/BurgerMan90001/untitled-backend/internal/util"
 )
 
-type Server struct {}
-
-var user = model.User {
-    Id: "123",
-    Firstname: "dasdasd",
-    Lastname: "Wwww",
-    Age: 32,
+type Server struct {
+	db *sql.DB
 }
 
 
-func NewServer() *Server {
-	s := Server{}
+func NewServer(db *sql.DB) *Server {
+	s := Server{db}
 	return &s;
 }
 
-
 func (s Server) createUser(w http.ResponseWriter, r *http.Request) {
-	
 	var user = model.User {
 		Id: "123",
 		Firstname: "dasdasd",
@@ -40,22 +35,30 @@ func (s Server) createUser(w http.ResponseWriter, r *http.Request) {
 	util.WriteJSON(w, user)
 }
 
-
-
-
 func Run() {
 	const url = "localhost:8080"
 
+	var databaseUrl string
 
+	
+	// setup database
+	cfg := config.PgConfigFromEnv()
+	databaseUrl = cfg.String()
+	db := config.DatabaseConnect(databaseUrl)
+
+	// setup server
 	mux := http.NewServeMux()
-	server := NewServer()
+	server := NewServer(db)
+	
 
+	// setup routes
 	mux.HandleFunc("GET /", server.createUser)
 	
+
+	// add middleware
+	handler := middleware.Logger(mux)
+
+	
+    log.Fatal(http.ListenAndServe(url, handler))
 	log.Printf("Server listening at %s", url)
-
-	config.RunDatabase()
-	//tests.Test()
-
-    log.Fatal(http.ListenAndServe(url, mux))
 }

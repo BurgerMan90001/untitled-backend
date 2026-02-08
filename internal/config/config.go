@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"sort"
 )
@@ -16,9 +17,9 @@ type pgconfig struct {
 }
 
 
-
-func pgConfigFromEnv() (pgconfig, error) {
+func PgConfigFromEnv() pgconfig {
     var missing []string
+    var err error = nil
 
     get := func(key string) string {
         val := os.Getenv(key)
@@ -35,23 +36,35 @@ func pgConfigFromEnv() (pgconfig, error) {
         port:     get("PG_PORT"),
         sslMode:  os.Getenv("PG_SSLMODE"), // optional, so we don't add it to missing
     }
-    switch cfg.sslMode {
-    case "", "disable", "allow", "require", "verify-ca", "verify-full":
-        // valid sslmode
-    default:
-        return cfg, fmt.Errorf(`invalid sslmode "%s": expected one of "", "disable", "allow", "require", "verify-ca", or "verify-full"`, cfg.sslMode)
-    }
 
-    if len(missing) > 0 {
-        sort.Strings(missing) // sort for consistency in error message
-        return cfg, fmt.Errorf("missing required environment variables: %v", missing)
+    err = checkSslMode(cfg)
+
+    err = checkMissingVars(missing)
+
+    if err != nil {
+		log.Fatalf("Postgres configuration error %v", err)
+	}
+    return cfg
+}
+func checkSslMode(cfg pgconfig) (error) {
+    switch cfg.sslMode {
+    // valid sslmode
+    case "", "disable", "allow", "require", "verify-ca", "verify-full":
+        return nil
+    default:
+        return fmt.Errorf(`invalid sslmode "%s": expected one of "", "disable", "allow", "require", "verify-ca", or "verify-full"`, cfg.sslMode)
     }
-    return cfg, nil
 }
 
-
+func checkMissingVars(missing []string) error {
+    if len(missing) > 0 {
+        sort.Strings(missing) // sort for consistency in error message
+        return fmt.Errorf("missing required environment variables: %v", missing)
+    }
+    return nil
+}
 //"postgres://username:password@localhost:5432/database_name?sslmode=mode"
-func (pg pgconfig) string() string {
+func (pg pgconfig) String() string {
 	s := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", pg.username, pg.password, pg.host, pg.port, pg.database)
 	if pg.sslMode != "" {
 		s += "?sslmode=" + pg.sslMode
