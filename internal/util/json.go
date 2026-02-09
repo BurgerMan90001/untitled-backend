@@ -7,8 +7,6 @@ import (
 	"net/http"
 )
 
-
-
 func ReadJSON[T any](r io.ReadCloser) (T, error) {
 	var v T
 	// decode the JSON into v

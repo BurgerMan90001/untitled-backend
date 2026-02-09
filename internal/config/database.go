@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"io"
 	"log"
 	"strconv"
@@ -13,17 +14,12 @@ import (
 
 //"postgres://username:password@localhost:5432/database_name?sslmode=mode"
 
-func RunDatabase() {
-	cfg, err := pgConfigFromEnv()
 
-	if err != nil {
-		log.Fatalf("Postgres configuration error %v", err)
-	}
-	
+func RunEmbedDatabase(cfg pgconfig) {
+
 	embedCfg := embedBuildConfig(cfg)
 
 	embedDb := embeddedpostgres.NewDatabase(embedCfg)
-
 
 	if err := embedDb.Start(); err != nil {
 		panic(err)
@@ -32,13 +28,14 @@ func RunDatabase() {
 	log.Printf("Postgres running on %s\n", embedCfg.GetConnectionURL())
 
 	defer embedDb.Stop()
-
-	DatabaseConnect(cfg.string())
 }
-func DatabaseConnect(url string) (*sql.DB, error) {
+
+
+func DatabaseConnect(url string) *sql.DB {
 	const timeout = 5*time.Second
 
-	db, err := sql.Open("postgres",url)
+	fmt.Printf("Connecting to %s\n", url)
+	db, err := sql.Open("postgres", url)
 
 	if err != nil {
 		panic(err)
@@ -55,7 +52,7 @@ func DatabaseConnect(url string) (*sql.DB, error) {
 
     log.Println("Ping successful")
 
-	return db, nil
+	return db
 }
 
 func embedBuildConfig(cfg pgconfig) embeddedpostgres.Config {
