@@ -1,4 +1,4 @@
-package config
+package database
 
 import (
 	"fmt"
@@ -17,7 +17,7 @@ type pgconfig struct {
 }
 
 
-func PgConfigFromEnv() pgconfig {
+func pgConfigFromEnv() pgconfig {
     var missing []string
     var err error = nil
 
@@ -29,12 +29,12 @@ func PgConfigFromEnv() pgconfig {
         return val
     }
     cfg := pgconfig{
-        username: get("PG_USER"),
-        database: get("PG_DATABASE"),
-        host:     get("PG_HOST"),
-        password: get("PG_PASSWORD"),
-        port:     get("PG_PORT"),
-        sslMode:  os.Getenv("PG_SSLMODE"), // optional, so we don't add it to missing
+        username: get("POSTGRES_USER"),
+        database: get("POSTGRES_DATABASE"),
+        host:     get("POSTGRES_HOST"),
+        password: get("POSTGRES_PASSWORD"),
+        port:     get("POSTGRES_PORT"),
+        sslMode:  os.Getenv("POSTGRES_SSLMODE"), // optional, so we don't add it to missing
     }
 
     err = checkSslMode(cfg)

@@ -1,0 +1,23 @@
+#FROM golang:1.23-alpine AS base
+
+services:
+  db:
+    image: postgres:latest
+    #restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./dataset:/docker-entrypoint-initdb.d
+    ports:
+      - 5432:5432
+    #networks:
+    # - container_network
+  server:
+    build: .
+    #command: ls
+    ports:
+      - 8080:8080
+
+#networks:
+# container_network:
+#  driver: bridge

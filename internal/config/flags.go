@@ -1,4 +1,4 @@
-package server
+package config
 
 import (
 	"flag"
@@ -6,7 +6,7 @@ import (
 )
 
 
-func test123() {
+func CreateFlags() {
 	test := flag.String("timeout", "asdasd", "timeout for connecting to postgres")
 	flag.Parse()
 	fmt.Println(*test)

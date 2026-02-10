@@ -1,8 +1,17 @@
+FROM golang:1.25-alpine
 
-FROM golang:1.23-alpine AS base
+WORKDIR /usr/src/app
+COPY . . 
 
-#WORKDIR /the/workdir/path
 
-#RUN go run main.go
+# Copy go modules
+#COPY go.mod go.sum ./
+#RUN go mod tidy
 
+
+COPY cmd/backend/main.go ./
+
+RUN go build ./main.go
 EXPOSE 8080
+
+ENTRYPOINT ["./main"]

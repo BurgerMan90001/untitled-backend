@@ -1,19 +1,12 @@
-package config
+package database
 
 import (
-	"context"
-	"database/sql"
-	"fmt"
 	"io"
 	"log"
 	"strconv"
-	"time"
 
 	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
 )
-
-//"postgres://username:password@localhost:5432/database_name?sslmode=mode"
-
 
 func RunEmbedDatabase(cfg pgconfig) {
 
@@ -28,31 +21,6 @@ func RunEmbedDatabase(cfg pgconfig) {
 	log.Printf("Postgres running on %s\n", embedCfg.GetConnectionURL())
 
 	defer embedDb.Stop()
-}
-
-
-func DatabaseConnect(url string) *sql.DB {
-	const timeout = 5*time.Second
-
-	fmt.Printf("Connecting to %s\n", url)
-	db, err := sql.Open("postgres", url)
-
-	if err != nil {
-		panic(err)
-	}
-	// close connection
-	defer db.Close()
-
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-    defer cancel()
-
-    if err := db.PingContext(ctx); err != nil {
-        panic(err)
-    }
-
-    log.Println("Ping successful")
-
-	return db
 }
 
 func embedBuildConfig(cfg pgconfig) embeddedpostgres.Config {
