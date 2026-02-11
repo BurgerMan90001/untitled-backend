@@ -5,30 +5,32 @@ import (
 	"log"
 	"strconv"
 
-	embeddedpostgres "github.com/fergusstrange/embedded-postgres"
+	embpg "github.com/fergusstrange/embedded-postgres"
 )
 
-func RunEmbedDatabase(cfg pgconfig) {
-
+func CreateEmbedDatabase() (*embpg.EmbeddedPostgres, string) {
+	cfg := pgConfigFromEnv()
 	embedCfg := embedBuildConfig(cfg)
+	embedDb := embpg.NewDatabase(embedCfg)
 
-	embedDb := embeddedpostgres.NewDatabase(embedCfg)
-
+	startEmbedDatabase(embedDb)
+	
+	log.Printf("Postgres running on %s\n", embedCfg.GetConnectionURL())
+	
+	return embedDb, embedCfg.GetConnectionURL()
+}
+func startEmbedDatabase(embedDb *embpg.EmbeddedPostgres) {
 	if err := embedDb.Start(); err != nil {
 		panic(err)
 	}
-
-	log.Printf("Postgres running on %s\n", embedCfg.GetConnectionURL())
-
-	defer embedDb.Stop()
 }
 
-func embedBuildConfig(cfg pgconfig) embeddedpostgres.Config {
+func embedBuildConfig(cfg pgconfig) embpg.Config {
 	portNum, err := strconv.Atoi(cfg.port)
 	if err != nil {
 		panic(err)
 	}
-	return embeddedpostgres.DefaultConfig().
+	return embpg.DefaultConfig().
 		Username(cfg.username).
 		Password(cfg.password).
 		Database(cfg.database).

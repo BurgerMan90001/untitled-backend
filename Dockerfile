@@ -1,4 +1,5 @@
-FROM golang:1.25-alpine
+#FROM golang:1.25-alpine
+FROM golang
 
 WORKDIR /usr/src/app
 COPY . . 
@@ -9,9 +10,9 @@ COPY . .
 #RUN go mod tidy
 
 
-COPY cmd/backend/main.go ./
+#COPY cmd/backend/main.go ./
 
-RUN go build ./main.go
-EXPOSE 8080
+RUN go build cmd/backend/main.go 
+
 
 ENTRYPOINT ["./main"]

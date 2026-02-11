@@ -8,22 +8,34 @@ import (
 	"time"
 )
 
-func DatabaseConnect() *sql.DB {
-	cfg := pgConfigFromEnv()
-	databaseUrl := cfg.String()
-	return DatabaseConnectURL(databaseUrl)
+/* Connects to database from env */
+func DatabaseConnectEnv() *sql.DB {
+	databaseUrl := GetConnectURL()
+	db := DatabaseConnectURL(databaseUrl)
+
+	return db
+}
+/* Connects to database from specified string */
+func DatabaseConnectURL(url string) *sql.DB {
+	
+	db := openDatabase(url)
+	pingDatabase(db)
+	
+	return db
 }
 
-func DatabaseConnectURL(url string) *sql.DB {
-	const timeout = 5*time.Second
-
+func openDatabase(url string) *sql.DB {
 	fmt.Printf("Connecting to %s\n", url)
 	db, err := sql.Open("postgres", url)
 
 	if err != nil {
 		panic(err)
 	}
+	return db
+}
 
+func pingDatabase(db *sql.DB) {
+	const timeout = 5*time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
     defer cancel()
 
@@ -32,11 +44,6 @@ func DatabaseConnectURL(url string) *sql.DB {
     }
 
     log.Println("Ping successful")
-
-	
-
-	return db
 }
-func initDatabase() {}
 
 

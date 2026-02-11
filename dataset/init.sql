@@ -1,10 +1,10 @@
 
-CREATE DATABASE IF NOT EXISTS untitled;
+CREATE DATABASE untitled;
 
-CREATE TABLE IF NOT EXISTS users (
-    id TEXT
-    username TEXT
-    email TEXT
+CREATE TABLE users (
+    _id TEXT,
+    username TEXT,
+    email TEXT,
 )
 
 COPY users

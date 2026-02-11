@@ -6,8 +6,12 @@ import (
 )
 
 
-func CreateFlags() {
-	test := flag.String("timeout", "asdasd", "timeout for connecting to postgres")
+func CreateFlags() *string {
+	
+	environment := flag.String("environment", "dev", "the environment stage")
+
 	flag.Parse()
-	fmt.Println(*test)
+	fmt.Println(*environment)
+
+	return environment
 }

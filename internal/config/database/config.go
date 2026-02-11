@@ -64,10 +64,12 @@ func checkMissingVars(missing []string) error {
     return nil
 }
 //"postgres://username:password@localhost:5432/database_name?sslmode=mode"
-func (pg pgconfig) String() string {
-	s := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", pg.username, pg.password, pg.host, pg.port, pg.database)
-	if pg.sslMode != "" {
-		s += "?sslmode=" + pg.sslMode
+func GetConnectURL() string {
+    cfg := pgConfigFromEnv()
+    
+	s := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", cfg.username, cfg.password, cfg.host, cfg.port, cfg.database)
+	if cfg.sslMode != "" {
+		s += "?sslmode=" + cfg.sslMode
 	}
 	return s
 }

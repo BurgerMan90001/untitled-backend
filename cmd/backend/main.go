@@ -9,7 +9,12 @@ import (
 func main() {
 	config.LoadEnv()
 
-    server.Run()
+	//config.CreateFlags()
+	// setup database
+	// embedDb := database.RunEmbedDatabase()
+	// db := database.DatabaseConnectURL(embedDb.GetConnectionURL())
+	server.Run()
+	//defer embedDb.Stop()
+
+	//defer db.Close()
 }
-
-

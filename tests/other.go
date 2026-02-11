@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/BurgerMan90001/untitled-backend/internal/model"
+	"github.com/BurgerMan90001/untitled-backend/internal/model/responses"
 )
 
 type Response struct{ Time string } // note: no JSON tags here, so we just use 'Time' in uppercase.
@@ -30,13 +31,13 @@ func getTime(w http.ResponseWriter, r *http.Request) {
 		tz, err = time.LoadLocation(req.TZ)
 		if err != nil || tz == nil {
 			w.WriteHeader(400) // bad request
-			json.NewEncoder(w).Encode(model.Error{err.Error()})
+			json.NewEncoder(w).Encode(responses.Error{err.Error()})
 			return
 		}
 	}
 	format := time.RFC3339
 	if req.Format != "" {
-		format = req.Format
+		format = req.Format	
 	}
 
 	resp := Response{time.Now().In(tz).Format(format)}

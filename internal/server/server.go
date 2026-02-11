@@ -5,8 +5,9 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/BurgerMan90001/untitled-backend/internal/config/database"
 	"github.com/BurgerMan90001/untitled-backend/internal/middleware"
-	"github.com/BurgerMan90001/untitled-backend/internal/model"
+	"github.com/BurgerMan90001/untitled-backend/internal/model/responses"
 	"github.com/BurgerMan90001/untitled-backend/internal/util"
 )
 
@@ -21,114 +22,47 @@ func NewServer(db *sql.DB) *Server {
 	return &s;
 }
 */
-/*
-func queryUserById(db *sql.DB, id string) model.User {
-	rows, err := db.QueryContext(context.TODO(), "SELECT * FROM users WHERE id=?", id)
-	if err != nil {
-		log.Fatal(err)
-	}
-	var user model.User
-	var (
-		username string
-		email string
-	)
-	defer rows.Close()
-	for rows.Next() {
-		if err := rows.Scan(&username, &email); err != nil {
-			log.Fatal(err)
 
-		}
-	}
-	user = model.User{
-		Id: id, Username: username, Email: email,
-	}
-	return user
-}
-*/
-func getUserById(db *sql.DB) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		id := r.PathValue("id")
+func environmentSetup(environment string) (*sql.DB)  {
+	var db *sql.DB
+	switch environment {
+	case "dev": 
+		// create emb
+		//embedDb, databaseUrl := database.CreateEmbedDatabase()
 
-		// validate request
+		db = database.DatabaseConnectEnv()
 		
-
-		// query the user
-		rows, err := db.Query("SELECT * FROM users WHERE id=?", id)
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		defer rows.Close()
-
-		var (
-			username string
-			email string
-		)
-		
-		for rows.Next() {
-			if err := rows.Scan(&username, &email); err != nil {
-				log.Fatal(err)
-				
-			}
-		}
-		user := model.User{
-			Id: id, Username: username, Email: email,
-		}
-	
-		util.WriteJSON(w, user)
+	case "prod":
+		// connect to local database
+		//db = database.DatabaseConnect()
 	}
+	return db
 }
 
-func createUserById(db *sql.DB) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		
-		//r.BasicAuth()
-		util.WriteJSON(w, nil)
-	}
-}
-
-func deleteUserById(db *sql.DB) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		//id := r.PathValue("id")
-
-		// validatie 
-
-		// query
-		//user := queryUser(db, id)
-
-
-		util.WriteJSON(w, model.DeleteResponse{Message: "Successfully deleted user"})
-	}
-}
-
-func testRoute(w http.ResponseWriter, r *http.Request) {
-
-	util.WriteJSON(w, model.Response{Message: "Root"})
-	
-}
 
 func Run() {
-	const url = "localhost:8080"
-	
+	const serverUrl = "localhost:8080"
+
+	//environment := config.CreateFlags()
+
 	// setup database
-	
-	//db := database.DatabaseConnect()
+	//db := environmentSetup(*environment)
 	//defer db.Close()
 
 	// setup server
 	mux := http.NewServeMux()
 
-	// setup routes
-	mux.HandleFunc("/", testRoute)
-	// mux.HandleFunc("GET /user/{id}", getUserById(db))
-	// mux.HandleFunc("POST /user/{id}", createUserById(db))
-	// mux.HandleFunc("DELETE /user/{id}", deleteUserById(db))
+
+	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+		util.WriteJSON(w, responses.Response{Message: "aildlasdasd"})
+	})
 	
+	//setupRoutes(mux, db)
+
 	// add middleware
 	handler := middleware.Logger(mux)
 
 	// start server
-	log.Printf("Server listening at %s", url)
-    log.Fatal(http.ListenAndServe(url, handler))
+	log.Printf("Server listening at %s", serverUrl)
+    log.Fatal(http.ListenAndServe(serverUrl, handler))
 }
