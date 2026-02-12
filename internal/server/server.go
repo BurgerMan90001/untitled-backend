@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/BurgerMan90001/untitled-backend/internal/config"
 	"github.com/BurgerMan90001/untitled-backend/internal/config/database"
 	"github.com/BurgerMan90001/untitled-backend/internal/middleware"
 )
@@ -23,7 +24,7 @@ func environmentSetup(environment string) *sql.DB {
 }
 
 func Run() {
-	const serverUrl = "localhost:8080"
+	serverUrl := config.GetServerURL()
 
 	//environment := config.CreateFlags()
 

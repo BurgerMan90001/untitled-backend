@@ -16,18 +16,21 @@ func DatabaseConnectEnv() *sql.DB {
 
 	return db
 }
+
 /* Connects to database from specified string */
 func DatabaseConnectURL(url string) *sql.DB {
-	
+
 	db := openDatabase(url)
 	// test database connection
 	pingDatabase(db)
-	
+
+	createDatabase(db)
+
 	return db
 }
 
 func openDatabase(url string) *sql.DB {
-	fmt.Printf("Connecting to %s\n", url)
+	fmt.Println("Connecting to postgres database...")
 	db, err := sql.Open("postgres", url)
 
 	if err != nil {
@@ -36,16 +39,18 @@ func openDatabase(url string) *sql.DB {
 	return db
 }
 
-func pingDatabase(db *sql.DB) {
-	const timeout = 5*time.Second
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
-    defer cancel()
+func createDatabase(db *sql.DB) {
 
-    if err := db.PingContext(ctx); err != nil {
-        panic(err)
-    }
-
-    log.Println("Ping successful")
 }
 
+func pingDatabase(db *sql.DB) {
+	const timeout = 5 * time.Second
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
 
+	if err := db.PingContext(ctx); err != nil {
+		panic(err)
+	}
+
+	log.Println("Ping successful")
+}
