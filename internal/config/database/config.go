@@ -56,9 +56,11 @@ func checkSslMode(cfg pgconfig) (error) {
     }
 }
 
+
 func checkMissingVars(missing []string) error {
     if len(missing) > 0 {
-        sort.Strings(missing) // sort for consistency in error message
+        // sort for consistency in error message
+        sort.Strings(missing)
         return fmt.Errorf("missing required environment variables: %v", missing)
     }
     return nil

@@ -1,9 +1,9 @@
-#FROM golang:1.25-alpine
-FROM golang
+
+FROM golang:1.25-alpine
+#FROM golang
 
 WORKDIR /usr/src/app
-COPY . . 
-
+COPY . .
 
 # Copy go modules
 #COPY go.mod go.sum ./
@@ -14,5 +14,5 @@ COPY . .
 
 RUN go build cmd/backend/main.go 
 
-
+EXPOSE 8080
 ENTRYPOINT ["./main"]

@@ -11,6 +11,7 @@ import (
 /* Connects to database from env */
 func DatabaseConnectEnv() *sql.DB {
 	databaseUrl := GetConnectURL()
+
 	db := DatabaseConnectURL(databaseUrl)
 
 	return db
@@ -19,6 +20,7 @@ func DatabaseConnectEnv() *sql.DB {
 func DatabaseConnectURL(url string) *sql.DB {
 	
 	db := openDatabase(url)
+	// test database connection
 	pingDatabase(db)
 	
 	return db

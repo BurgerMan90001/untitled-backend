@@ -3,14 +3,22 @@ package server
 import (
 	"database/sql"
 	"net/http"
-)
 
+	"github.com/BurgerMan90001/untitled-backend/internal/controllers"
+)
 
 func setupRoutes(mux *http.ServeMux, db *sql.DB) {
 	// setup routes
-	mux.HandleFunc("/", root)
-	mux.HandleFunc("GET /health", healthCheck)
-	mux.HandleFunc("GET /user/{id}", getUserById(db))
-	mux.HandleFunc("POST /user/{id}", createUserById(db))
-	mux.HandleFunc("DELETE /user/{id}", deleteUserById(db))
+	mux.HandleFunc("/", controllers.Root)
+	mux.HandleFunc("GET /health", controllers.HealthCheck)
+
+	// user routes
+	mux.HandleFunc("/user/{id}", controllers.UserController(db))
+
+	// static files
+	//mux.HandleFunc("GET /static", nil)
+
+	//TODO auth routes
+	//mux.HandleFunc("GET /auth", middleware.)
+	mux.Handle("/static/", http.FileServer(http.Dir("public")))
 }
