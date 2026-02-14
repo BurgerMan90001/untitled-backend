@@ -7,33 +7,21 @@ import (
 	"github.com/BurgerMan90001/untitled-backend/internal/util"
 )
 
-/*
-func queryUserById(db *sql.DB, id string) model.User {
-	rows, err := db.QueryContext(context.TODO(), "SELECT * FROM users WHERE id=?", id)
-	if err != nil {
-		log.Fatal(err)
-	}
-	var user model.User
-	var (
-		username string
-		email string
-	)
-	defer rows.Close()
-	for rows.Next() {
-		if err := rows.Scan(&username, &email); err != nil {
-			log.Fatal(err)
-
-		}
-	}
-	user = model.User{
-		Id: id, Username: username, Email: email,
-	}
-	return user
+oauthConfig := oauth2.Config{
+	ClientID:     "your_client_id",
+	ClientSecret: "your_client_secret",
+	RedirectURL:  "http://localhost:8080/callback",
+	Scopes:       []string{"profile", "email"},
+	Endpoint: oauth2.Endpoint{
+		AuthURL:  "https://oauth_provider.com/oauth2/authorize",
+		TokenURL: "https://oauth_provider.com/oauth2/token",
+	},
 }
-*/
-
 func Root(w http.ResponseWriter, r *http.Request) {
-	util.WriteJSON(w, responses.Response{Message: "root"})
+
+	url := oauthConfig.AuthCodeURL("state")
+	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+	//util.WriteJSON(w, responses.Response{Message: "root"})
 }
 
 func HealthCheck(w http.ResponseWriter, r *http.Request) {
