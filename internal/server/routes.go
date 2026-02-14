@@ -15,10 +15,14 @@ func setupRoutes(mux *http.ServeMux, db *sql.DB) {
 	// user routes
 	mux.HandleFunc("/user/{id}", controllers.UserController(db))
 
+
+
+	
+
 	// static files
 	//mux.HandleFunc("GET /static", nil)
 
 	//TODO auth routes
-	//mux.HandleFunc("GET /auth", middleware.)
+	//mux.HandleFunc("/login/oauth", middleware.)
 	mux.Handle("/static/", http.FileServer(http.Dir("public")))
 }

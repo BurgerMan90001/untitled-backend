@@ -40,6 +40,7 @@ func Run() {
 
 	// add middleware
 	handler := middleware.Logger(mux)
+	//handler = middleware.PanicRecovery(mux)
 
 	// start server
 	log.Printf("Server listening at %s", serverUrl)

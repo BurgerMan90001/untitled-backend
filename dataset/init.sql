@@ -2,7 +2,7 @@
 CREATE DATABASE untitled;
 
 CREATE TABLE users (
-    id INT PRIMARY KEY AUTOINCREMENT,
+    id INT PRIMARY KEY SERIAL,
     username TEXT,
     email TEXT,
 )
