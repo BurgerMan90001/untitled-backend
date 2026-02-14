@@ -5,9 +5,8 @@ import (
 	"encoding/base32"
 )
 
-
-func generateRandomString() string {
-	bytes := make([]byte, 12)
+func GenerateRandomString() string {
+	bytes := make([]byte, 16)
 	rand.Read(bytes)
 	return base32.StdEncoding.EncodeToString(bytes)
 }

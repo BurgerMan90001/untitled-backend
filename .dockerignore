@@ -6,7 +6,11 @@
 go.work
 go.work.sum
 
+# folders
 tests
+dataset
+
+README.md
 
 Makefile
 
