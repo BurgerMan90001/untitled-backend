@@ -2,11 +2,13 @@ package server
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
-	"github.com/BurgerMan90001/untitled-backend/internal/config"
 	"github.com/BurgerMan90001/untitled-backend/internal/config/database"
+	"github.com/BurgerMan90001/untitled-backend/internal/controllers"
 	"github.com/BurgerMan90001/untitled-backend/internal/middleware"
 )
 
@@ -23,8 +25,13 @@ func environmentSetup(environment string) *sql.DB {
 	return db
 }
 
+
+func GetServerURL() string {
+	return fmt.Sprintf(":%s", os.Getenv("SERVER_PORT"))
+}
+
 func Run() {
-	serverUrl := config.GetServerURL()
+	serverUrl := GetServerURL()
 
 	//environment := config.CreateFlags()
 
@@ -35,6 +42,11 @@ func Run() {
 
 	// setup server
 	mux := http.NewServeMux()
+
+	// setup routes
+	mux.HandleFunc("/", controllers.Root)
+	mux.HandleFunc("GET /health", controllers.HealthCheck)
+
 
 	setupRoutes(mux, db)
 

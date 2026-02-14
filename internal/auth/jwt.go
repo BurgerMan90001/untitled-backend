@@ -1,6 +1,8 @@
 package auth
 
 import (
+	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -16,6 +18,7 @@ func JWT(next http.Handler) http.Handler {
 
 func CreateJWTToken(userID string) (string, error) {
 
+	signingKey := getJWTSecretKey()
 	// expires in 24 hours
 	//expirationTime := time.Now().Add(24 * time.Hour)
 
@@ -23,13 +26,37 @@ func CreateJWTToken(userID string) (string, error) {
 	expirationTime := time.Now().Add(3 * time.Minute)
 
 	//claims := jwt.StandardClaims{ExpiresAt: expirationTime.Unix(), Id: userID}
-	token := jwt.New(jwt.SigningMethodHS256)
+	claims := &jwt.RegisteredClaims{
+		ExpiresAt: jwt.NewNumericDate(expirationTime),
+		Issuer: "test",
+		
+	}
 
-	claims := token.Claims.(jwt.MapClaims)
-	claims["exp"] = expirationTime
-	claims["user"] = "adasdasdafaegdf"
-
-	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(signingKey)
 
 	return tokenString, err
+}
+
+func VerifyJWTToken(tokenString string) {
+	claims := &jwt.RegisteredClaims{}
+
+	token, err := jwt.ParseWithClaims(tokenString, claims, keyFunc, jwt.WithLeeway(5*time.Second))
+
+	if err != nil {
+		log.Fatal(err)
+	} else if claims, ok := token.Claims.(*jwt.RegisteredClaims); ok {
+		fmt.Println(claims.ExpiresAt, claims.Issuer)
+	} else {
+		log.Fatal("unknown claims type, cannot proceed")
+	}
+
+}
+
+func getJWTSecretKey() []byte {
+	return []byte(os.Getenv("JWT_SECRET"))
+}
+
+func keyFunc(token *jwt.Token) (any, error) {
+	return getJWTSecretKey(), nil
 }
